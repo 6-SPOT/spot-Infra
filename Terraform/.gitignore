@@ -1,0 +1,23 @@
+# Terraform 관련
+.terraform/                # Terraform provider 다운로드 폴더
+*.tfstate                  # Terraform 상태 파일 (기존 인프라 상태 포함)
+*.tfstate.backup           # Terraform 백업 상태 파일
+terraform.tfstate.d/       # Terraform workspace 관련 디렉터리
+
+# Terraform 실행 결과
+output.json                # Terraform output 결과 파일
+
+# Terraform 설정 파일 (환경 변수 설정)
+*.tfvars                   # 환경 변수 파일 (보통 민감한 정보 포함)
+*.tfvars.json              # JSON 형식의 환경 변수 파일
+
+# Terraform Lock 파일 (다른 환경에서 provider 충돌 방지)
+.terraform.lock.hcl
+
+# Shell 스크립트 실행 결과
+*.sh
+
+# Editor/IDE 설정 파일 (VSCode, IntelliJ)
+.vscode/
+.idea/
+*.swp                      # Vim swap 파일
