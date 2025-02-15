@@ -3,7 +3,7 @@ output "subnet_ids" {
   value       = aws_subnet.subnet[*].id
 }
 
-output "subnet_availability_zones" {
-  description = "List of availability zones for the subnets"
-  value       = aws_subnet.subnet[*].availability_zone
+output "subnet_cidrs" {
+  description = "List of subnet cidr"
+  value = aws_subnet.subnet[*].cidr_block
 }

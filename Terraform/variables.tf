@@ -1,3 +1,4 @@
+### testnet
 variable "region" {
   description = "AWS region"
   type        = string
@@ -35,13 +36,36 @@ variable "public_subnet_name" {
 }
 
 ### sg
+variable "sg_configs" {
+  description = "Security group configurations for different environments"
+  type = map(object({
+    description = string
+    ingress_rules = list(object({
+      id               = string
+      from_port        = number
+      to_port          = number
+      protocol         = string
+      cidr_blocks      = list(string)
+      ipv6_cidr_blocks = list(string)
+    }))
+    egress_rules = list(object({
+      id               = string
+      from_port        = number
+      to_port          = number
+      protocol         = string
+      cidr_blocks      = list(string)
+      ipv6_cidr_blocks = list(string)
+    }))
+  }))
+}
+
 variable "sg_description" {
   description = "The description of the security group"
   type        = string
   default     = "testnet Security group"
 }
 
-variable "sg_ingress_rules" {
+variable "sg_ingress_rules_infra" {
   description = "Ingress rules for the security group"
   type = list(object({
     id               = string
@@ -54,7 +78,33 @@ variable "sg_ingress_rules" {
   default = []
 }
 
-variable "sg_egress_rules" {
+variable "sg_egress_rules_infra" {
+  description = "Egress rules for the security group"
+  type = list(object({
+    id               = string
+    from_port        = number
+    to_port          = number
+    protocol         = string
+    cidr_blocks      = list(string)
+    ipv6_cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "sg_ingress_rules_server" {
+  description = "Ingress rules for the security group"
+  type = list(object({
+    id               = string
+    from_port        = number
+    to_port          = number
+    protocol         = string
+    cidr_blocks      = list(string)
+    ipv6_cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "sg_egress_rules_server" {
   description = "Egress rules for the security group"
   type = list(object({
     id               = string
@@ -74,7 +124,7 @@ variable "ec2_instance_profile_name" {}
 variable "ec2_policy_statements" {
   type = list(object({
     Effect   = string
-    Action   = list(string) 
+    Action   = list(string)
     Resource = string
   }))
 }
@@ -84,7 +134,7 @@ variable "codedeploy_policy_name" {}
 variable "codedeploy_policy_statements" {
   type = list(object({
     Effect   = string
-    Action   = list(string)  
+    Action   = list(string)
     Resource = string
   }))
 }
@@ -94,12 +144,36 @@ variable "codepipeline_policy_name" {}
 variable "codepipeline_policy_statements" {
   type = list(object({
     Effect   = string
-    Action   = list(string)  
+    Action   = list(string)
     Resource = string
   }))
 }
 
+### EC2
+variable "ec2_name" {
+  description = "ec2의 이름"
+  type        = list(string)
+  default     = ["my_ec2"]
+}
 
+variable "instance_type" {
+  description = "인스턴스 유형, ec2 갯수만큼 넣어줘야함"
+  type        = list(string)
+  default     = ["t2.micro"]
+}
 
+variable "key_name" {
+  description = "ssh용 키"
+  type        = string
+  default     = "test.pem"
+}
 
+variable "subnet_id" {
+  description = "ec2 생성될 subnet위치"
+  type        = string
+}
 
+variable "private_ip" {
+  description = "ec2에 지정할 프라이빗 ip"
+  type        = list(string)
+}

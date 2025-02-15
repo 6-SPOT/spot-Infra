@@ -11,10 +11,6 @@ module "public_subnets" {
   availability_zones = var.availability_zones
   name               = var.public_subnet_name
   public             = true
-  additional_tags = {
-    "kubernetes.io/role/elb"                     = "1"
-    "kubernetes.io/cluster/dododocs-eks-cluster" = "shared"
-  }
 }
 
 module "igw" {
@@ -29,26 +25,18 @@ module "route_table_public" {
   subnet_ids     = module.public_subnets.subnet_ids
   gateway_id     = module.igw.igw_id
   nat_gateway_id = null
-  name           = var.name 
+  name           = var.name
 }
 
-module "sg" {
-  source      = "./modules/sg"
-  name        = var.name
-  description = var.sg_description
-  vpc_id      = module.vpc.vpc_id
-  ingress_rules = var.sg_ingress_rules
-  egress_rules  = var.sg_egress_rules
-}
 
 module "iam_ec2" {
-  source                 = "./modules/iam"
-  role_name              = var.ec2_role_name
-  policy_name            = var.ec2_policy_name
-  assume_role_service    = "ec2.amazonaws.com"
+  source                  = "./modules/iam"
+  role_name               = var.ec2_role_name
+  policy_name             = var.ec2_policy_name
+  assume_role_service     = "ec2.amazonaws.com"
   create_instance_profile = true
   instance_profile_name   = var.ec2_instance_profile_name
-  policy_statements      = var.ec2_policy_statements
+  policy_statements       = var.ec2_policy_statements
 }
 
 module "iam_codedeploy" {
@@ -65,4 +53,28 @@ module "iam_codepipeline" {
   policy_name         = var.codepipeline_policy_name
   assume_role_service = "codepipeline.amazonaws.com"
   policy_statements   = var.codepipeline_policy_statements
+}
+
+module "sg" {
+  source = "./modules/sg"
+
+  for_each      = local.sg_configs
+  name          = each.key
+  description   = each.value.description
+  vpc_id        = module.vpc.vpc_id
+  ingress_rules = each.value.ingress_rules
+  egress_rules  = each.value.egress_rules
+}
+
+module "ec2" {
+  source               = "./modules/ec2"
+  iam_role             = module.iam_ec2.role_arn
+  iam_instance_profile = module.iam_ec2.instance_profile_name
+  ec2_name             = var.ec2_name
+  instance_type        = var.instance_type
+  key_name             = var.key_name
+  subnet_id            = module.public_subnets.subnet_ids[0]
+  ami                  = "ami-0077297a838d6761d"
+  private_ip           = var.private_ip
+  sg_ids               = local.sg_ids
 }

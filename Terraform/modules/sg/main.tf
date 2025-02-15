@@ -1,13 +1,7 @@
 resource "aws_security_group" "sg" {
-  name        = "${var.name}-sg-vpc"
+  name        = "testnet-${var.name}-sg"
   description = var.description
   vpc_id      = var.vpc_id
-
-  tags = merge(
-    {
-      Name = "${var.name}-sg"
-    },
-  )
 }
 
 resource "aws_security_group_rule" "inbound" {
