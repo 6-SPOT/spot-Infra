@@ -2,4 +2,4 @@
 custom_roles:
   - docker
   - cloudwatch
-  # - codedeploy
+  - codedeploy
