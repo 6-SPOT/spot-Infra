@@ -1,0 +1,8 @@
+- name: Apply roles for Infra group
+  hosts: infra
+  become: true
+  tasks:
+    - name: Include roles dynamically
+      include_role:
+        name: "{{ item }}"
+      loop: "{{ custom_roles }}"

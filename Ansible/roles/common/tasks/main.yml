@@ -1,0 +1,39 @@
+---
+- name: Update apt package index
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+
+- name: Upgrade all packages to the latest version
+  apt:
+    name: "*"
+    state: latest
+
+- name: Install common utilities
+  apt:
+    name:
+      - curl
+      - wget
+      - unzip
+      - git
+      - vim
+      - htop
+      - tree
+      - net-tools
+      - python3-pip
+    state: present  # `presenta` 오타 수정
+
+- name: Set timezone to Asia/Seoul
+  timezone:
+    name: Asia/Seoul
+
+- name: Ensure ntp service is installed and running
+  apt:
+    name: ntp
+    state: present
+
+- name: Enable and start ntp service
+  service:
+    name: ntp
+    state: started
+    enabled: yes
