@@ -1,0 +1,43 @@
+name: Push Lightweight Docker Image to AWS ECR
+
+on:
+  push:
+    branches:
+      - main # 필요하면 다른 브랜치로 변경 가능
+
+permissions:
+  id-token: write # OIDC를 이용한 AWS 인증을 위해 필요
+  contents: read # actions/checkout을 위해 필요
+
+jobs:
+  push_to_ecr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::160885287796:role/GithubActionsOIDC # 수정 필요 (IAM Role ARN 변경)
+          role-session-name: GitHubActionsSession
+          aws-region: ap-northeast-2 # 수정 필요 (AWS 리전 변경)
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and Push lightweight Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_NAME: test # 수정 필요 (ECR 리포지토리 이름 변경 가능)
+        run: |
+          # 가장 가벼운 이미지로 scratch를 사용 (hello world 바이너리만 포함)
+          echo "FROM scratch" > Dockerfile
+          echo "COPY hello /hello" >> Dockerfile
+          echo 'int main() { return 0; }' > hello.c
+          gcc hello.c -o hello -static -s
+
+          docker build -t $ECR_REGISTRY/$IMAGE_NAME:latest .
+          docker push $ECR_REGISTRY/$IMAGE_NAME:latest
