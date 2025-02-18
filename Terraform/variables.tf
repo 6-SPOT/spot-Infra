@@ -177,3 +177,12 @@ variable "private_ip" {
   description = "ec2에 지정할 프라이빗 ip"
   type        = list(string)
 }
+
+### ECR
+variable "ecr_repositories" {
+  description = "List of ECR repositories to create"
+  type        = map(string)
+  default = {
+    "" = ""
+  }
+}

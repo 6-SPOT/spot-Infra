@@ -78,3 +78,10 @@ module "ec2" {
   private_ip           = var.private_ip
   sg_ids               = local.sg_ids
 }
+
+resource "aws_ecr_repository" "foo" {
+  for_each             = var.ecr_repositories
+  name                 = each.value
+  image_tag_mutability = "MUTABLE"
+  force_delete         = true
+}
