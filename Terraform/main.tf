@@ -85,3 +85,18 @@ resource "aws_ecr_repository" "foo" {
   image_tag_mutability = "MUTABLE"
   force_delete         = true
 }
+
+module "s3" {
+  source = "./modules/s3"
+
+  for_each = var.s3_configs
+
+  bucket_name             = each.value.bucket_name
+  versioning              = each.value.versioning
+  encryption              = each.value.encryption
+  block_public_acls       = each.value.block_public_acls
+  block_public_policy     = each.value.block_public_policy
+  ignore_public_acls      = each.value.ignore_public_acls
+  restrict_public_buckets = each.value.restrict_public_buckets
+}
+

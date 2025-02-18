@@ -28,3 +28,8 @@ output "sg" {
   description = "sg 목록"
   value       = local.sg_ids
 }
+
+output "s3_buckets" {
+  description = "Created S3 bucket details"
+  value       = { for k, v in module.s3 : k => v.s3_bucket_id }
+}

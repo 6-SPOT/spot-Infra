@@ -186,3 +186,17 @@ variable "ecr_repositories" {
     "" = ""
   }
 }
+
+### S3
+variable "s3_configs" {
+  description = "Configurations for multiple S3 buckets"
+  type = map(object({
+    bucket_name = string
+    versioning  = bool
+    encryption  = bool
+    block_public_acls       = bool
+    block_public_policy     = bool
+    ignore_public_acls      = bool
+    restrict_public_buckets = bool
+  }))
+}

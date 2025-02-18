@@ -1,6 +1,7 @@
 ---
 custom_roles:
   - common
-  - docker
+  - nginx
+  - letsencrypt
   - vault
   - cloudwatch
