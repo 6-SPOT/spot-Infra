@@ -186,3 +186,34 @@ variable "ecr_repositories" {
     "" = ""
   }
 }
+
+### S3
+variable "s3_configs" {
+  description = "Configurations for multiple S3 buckets"
+  type = map(object({
+    bucket_name = string
+    versioning  = bool
+    encryption  = bool
+    block_public_acls       = bool
+    block_public_policy     = bool
+    ignore_public_acls      = bool
+    restrict_public_buckets = bool
+  }))
+}
+
+### Route53
+variable "aws_region" {
+  default = "ap-northeast-2"
+}
+
+variable "hosted_zone_id" {
+  description = "Route 53 Hosted Zone ID"
+  type        = string
+}
+
+variable "domain_mappings" {
+  description = "List of domains that need to be linked to EC2 instances"
+  type        = map(object({
+    subdomain  = string
+  }))
+}

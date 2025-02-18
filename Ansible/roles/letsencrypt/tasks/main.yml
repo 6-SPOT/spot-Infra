@@ -1,0 +1,21 @@
+- name: Install Certbot and required packages
+  apt:
+    name: certbot
+    state: present
+    update_cache: yes
+
+- name: Ensure webroot directory exists
+  file:
+    path: "{{ webroot_path }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Obtain TLS certificate for domain and subdomain
+  command: >
+    certbot certonly --webroot --webroot-path={{ webroot_path }}
+    -d {{ domain }} -d {{ subdomain }} --email {{ email }} --agree-tos --non-interactive
+  args:
+    creates: "/etc/letsencrypt/live/{{ domain }}/fullchain.pem"
+  notify: Restart Nginx  
