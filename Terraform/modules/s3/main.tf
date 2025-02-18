@@ -3,18 +3,11 @@ module "s3_bucket" {
   version = "4.2.2"
 
   bucket = var.bucket_name
+  force_destroy = false
 
   versioning = {
     enabled = var.versioning
   }
-
-  server_side_encryption_configuration = var.encryption ? {
-    rule = {
-      apply_server_side_encryption_by_default = {
-        sse_algorithm = "AES256"
-      }
-    }
-  } : {}
 
   block_public_acls       = var.block_public_acls
   block_public_policy     = var.block_public_policy
