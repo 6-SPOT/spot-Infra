@@ -1,3 +1,2 @@
 inventory.*
-group_vars/*
-files/*
+group_vars/all.yml

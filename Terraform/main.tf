@@ -100,3 +100,10 @@ module "s3" {
   restrict_public_buckets = each.value.restrict_public_buckets
 }
 
+module "route53" {
+  for_each      = var.domain_mappings
+  source        = "./modules/route53"
+  hosted_zone_id = var.hosted_zone_id
+  subdomain     = each.value.subdomain
+  public_ip     = local.infra_public_ip
+}

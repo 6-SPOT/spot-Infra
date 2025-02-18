@@ -200,3 +200,20 @@ variable "s3_configs" {
     restrict_public_buckets = bool
   }))
 }
+
+### Route53
+variable "aws_region" {
+  default = "ap-northeast-2"
+}
+
+variable "hosted_zone_id" {
+  description = "Route 53 Hosted Zone ID"
+  type        = string
+}
+
+variable "domain_mappings" {
+  description = "List of domains that need to be linked to EC2 instances"
+  type        = map(object({
+    subdomain  = string
+  }))
+}

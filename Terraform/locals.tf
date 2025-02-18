@@ -15,3 +15,7 @@ locals {
 locals {
   sg_ids = { for k, v in module.sg : k => v.sg_id }
 }
+
+locals {
+  infra_public_ip = lookup(module.ec2.ec2_mapped_by_name["testnet-Infra"], "public_ip", null)
+}
