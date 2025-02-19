@@ -91,3 +91,16 @@ http {
         }
     }
 }
+
+stream {
+    upstream mysql_backend {
+        server {{ be_private }}:3306;  # MySQL 서버 (프라이빗 IP)
+    }
+
+    server {
+        listen 3306;  # Nginx가 3306 요청을 수신
+        proxy_pass mysql_backend;  # 백엔드 MySQL로 전달
+        proxy_timeout 600s;
+        proxy_connect_timeout 600s;
+    }
+}

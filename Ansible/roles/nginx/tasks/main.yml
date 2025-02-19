@@ -1,13 +1,56 @@
-- name: Install Nginx
+- name: Install required dependencies
   apt:
-    name: nginx
+    name:
+      - gcc
+      - make
+      - libpcre3-dev
+      - zlib1g-dev
+      - libssl-dev
     state: present
     update_cache: yes
 
+- name: Download and extract Nginx source code
+  shell: |
+    wget -q https://nginx.org/download/nginx-1.26.3.tar.gz -O /tmp/nginx.tar.gz
+    tar -xzf /tmp/nginx.tar.gz -C /tmp
+  args:
+    creates: /tmp/nginx-1.26.3  # 이미 다운로드 & 압축해제된 경우 다시 실행 안 함
+
+- name: Configure and build Nginx from source
+  shell: |
+    cd /tmp/nginx-1.26.3
+    ./configure \
+        --with-stream \
+        --with-http_ssl_module \
+        --with-http_v2_module \
+        --with-http_gzip_static_module \
+        --with-http_realip_module \
+        --with-http_stub_status_module \
+        --with-threads
+    make
+    make install
+  args:
+    creates: /usr/local/nginx/sbin/nginx  # 이미 설치된 경우 다시 실행 안 함
+
+- name: Copy systemd service file for Nginx
+  copy:
+    src: "../files/nginx.daemon"
+    dest: "/etc/systemd/system/nginx.service"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Reload systemd and enable Nginx service
+  shell: |
+    systemctl daemon-reload
+    systemctl enable --now nginx
+  args:
+    executable: /bin/bash
+
 - name: Copy Nginx configuration from Jinja2 template
   template:
-    src: "../files/nginx.conf.j2"  # files/ 폴더에 있는 템플릿 사용
-    dest: /etc/nginx/nginx.conf
+    src: "../files/nginx.conf.j2"
+    dest: /usr/local/nginx/conf/nginx.conf
     owner: root
     group: root
     mode: '0644'
