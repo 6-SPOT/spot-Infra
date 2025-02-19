@@ -1,5 +1,5 @@
 - name: Apply roles for Infra group
-  hosts: infra
+  hosts: server
   become: true
   tasks:
     - name: Include roles dynamically

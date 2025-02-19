@@ -42,3 +42,8 @@ variable "sg_ids" {
   description = "붙여야할 sg그룹"
   type        = map(string)
 }
+
+variable "ec2_tags" {
+  description = "ec2에 붙여질 테그"
+  type        = list(string)
+}

@@ -6,7 +6,8 @@ module "ec2" {
     name          = name
     instance_type = var.instance_type[idx]
     private_ip    = var.private_ip[idx]
-    sg_id = lookup(var.sg_ids, name == "Infra" ? "infra" : "server", null)
+    sg_id         = lookup(var.sg_ids, name == "Infra" ? "infra" : "server", null)
+    tag_value     = var.ec2_tags[idx]
   } }
 
   name                   = each.value.name
@@ -19,7 +20,8 @@ module "ec2" {
   vpc_security_group_ids = [each.value.sg_id]
 
   tags = {
-    Name = "testnet-${each.value.name}"
-    Role = var.iam_role
+    Name         = "testnet-${each.value.name}"
+    Role         = var.iam_role
+    testnet_type = each.value.tag_value
   }
 }

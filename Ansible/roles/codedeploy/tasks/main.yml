@@ -1,0 +1,32 @@
+- name: Check if CodeDeploy agent is installed
+  shell: systemctl is-active codedeploy-agent
+  register: codedeploy_status
+  ignore_errors: yes
+
+- name: Install dependencies
+  apt:
+    name: ruby-full
+    state: present
+  become: yes
+  when: codedeploy_status.rc != 0
+
+- name: Download CodeDeploy installation script
+  get_url:
+    url: "https://aws-codedeploy-ap-northeast-2.s3.ap-northeast-2.amazonaws.com/latest/install"
+    dest: "/home/ubuntu/install"
+    mode: '0755'
+  when: codedeploy_status.rc != 0
+
+- name: Install CodeDeploy agent
+  command: "/home/ubuntu/install auto"
+  register: install_result
+  become: yes
+  when: codedeploy_status.rc != 0
+
+- name: Ensure CodeDeploy agent is running
+  systemd:
+    name: codedeploy-agent
+    state: started
+    enabled: yes
+  become: yes
+  when: codedeploy_status.rc != 0

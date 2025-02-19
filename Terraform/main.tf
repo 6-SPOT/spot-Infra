@@ -77,6 +77,7 @@ module "ec2" {
   ami                  = "ami-0077297a838d6761d"
   private_ip           = var.private_ip
   sg_ids               = local.sg_ids
+  ec2_tags             = var.ec2_tags
 }
 
 resource "aws_ecr_repository" "foo" {
@@ -101,9 +102,9 @@ module "s3" {
 }
 
 module "route53" {
-  for_each      = var.domain_mappings
-  source        = "./modules/route53"
+  for_each       = var.domain_mappings
+  source         = "./modules/route53"
   hosted_zone_id = var.hosted_zone_id
-  subdomain     = each.value.subdomain
-  public_ip     = local.infra_public_ip
+  subdomain      = each.value.subdomain
+  public_ip      = local.infra_public_ip
 }
