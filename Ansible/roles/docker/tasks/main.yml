@@ -49,3 +49,33 @@
     name: docker
     state: started
     enabled: yes
+
+- name: Install Amazon ECR Credential Helper
+  apt:
+    name: amazon-ecr-credential-helper
+    state: present
+
+- name: Create Docker config directory
+  file:
+    path: /root/.docker
+    state: directory
+    mode: '0755'
+
+- name: Configure Docker to use Amazon ECR Credential Helper
+  copy:
+    dest: /root/.docker/config.json
+    content: |
+      {
+        "credHelpers": {
+          "160885287796.dkr.ecr.ap-northeast-2.amazonaws.com": "ecr-login"
+        }
+      }
+    mode: '0644'
+
+- name: Verify Amazon ECR Credential Helper installation
+  shell: which docker-credential-ecr-login
+  register: ecr_helper_path
+  changed_when: false
+
+- debug:
+    msg: "Amazon ECR Credential Helper installed at {{ ecr_helper_path.stdout }}"
