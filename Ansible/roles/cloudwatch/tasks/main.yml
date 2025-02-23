@@ -13,7 +13,24 @@
     dest: /home/ubuntu/config.json
 
 - name: Moving config
-  shell: sudo mv /home/ubuntu/config.json /opt/aws/amazon-cloudwatch-agent/bin
+  shell: sudo mv /home/ubuntu/config.json /opt/aws/amazon-cloudwatch-agent/etc
 
-- name: Starting cwagent
-  shell: sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+- name: Add CloudWatch Agent user to docker group
+  user:
+    name: cwagent
+    groups: docker
+    append: yes`
+
+- name: Enable CloudWatch Agent service
+  systemd:
+    name: amazon-cloudwatch-agent
+    enabled: yes
+    state: restarted
+
+- name: Start CloudWatch Agent
+  command: >
+    /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl
+    -a fetch-config
+    -m ec2
+    -s
+    -c file:/opt/aws/amazon-cloudwatch-agent/etc/config.json

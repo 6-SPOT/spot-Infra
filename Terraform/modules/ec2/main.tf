@@ -19,6 +19,12 @@ module "ec2" {
   private_ip             = each.value.private_ip
   vpc_security_group_ids = [each.value.sg_id]
 
+  root_block_device = each.value.name == "BE" ? [{
+  volume_size           = 100 
+  volume_type           = "gp2"
+  delete_on_termination = true
+  }] : []
+
   tags = {
     Name         = "testnet-${each.value.name}"
     Role         = var.iam_role

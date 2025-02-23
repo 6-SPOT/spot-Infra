@@ -6,6 +6,7 @@ output "ec2_mapped_by_name" {
       private_ip = instance.private_ip
       public_ip  = instance.public_ip
       arn        = instance.arn
+      ebs_id     = instance.root_block_device
     }
   }
 }
