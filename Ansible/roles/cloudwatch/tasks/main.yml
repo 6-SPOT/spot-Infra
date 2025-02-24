@@ -1,3 +1,9 @@
+- name: Check if Docker is installed
+  command: which docker
+  register: docker_check
+  ignore_errors: yes
+  changed_when: false
+
 - name: Download CloudWatch Agent installer
   get_url:
     url: https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
@@ -12,14 +18,15 @@
     src: ../files/cloudwatchagent.json
     dest: /home/ubuntu/config.json
 
-- name: Moving config
+- name: Move config
   shell: sudo mv /home/ubuntu/config.json /opt/aws/amazon-cloudwatch-agent/etc
 
-- name: Add CloudWatch Agent user to docker group
+- name: Add CloudWatch Agent user to docker group (only if Docker is installed)
   user:
     name: cwagent
     groups: docker
-    append: yes`
+    append: yes
+  when: docker_check.rc == 0
 
 - name: Enable CloudWatch Agent service
   systemd:
