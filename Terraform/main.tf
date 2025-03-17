@@ -13,6 +13,15 @@ module "public_subnets" {
   public             = true
 }
 
+module "private_subnets" {
+  source             = "./modules/subnet"
+  vpc_id             = module.vpc.vpc_id
+  subnet_cidrs       = var.private_subnet_cidrs
+  availability_zones = var.availability_zones_private
+  name               = var.private_subnet_name
+  public             = true
+}
+
 module "igw" {
   source = "./modules/igw"
   vpc_id = module.vpc.vpc_id
@@ -23,6 +32,15 @@ module "route_table_public" {
   source         = "./modules/route_table"
   vpc_id         = module.vpc.vpc_id
   subnet_ids     = module.public_subnets.subnet_ids
+  gateway_id     = module.igw.igw_id
+  nat_gateway_id = null
+  name           = var.name
+}
+
+module "route_table_private" {
+  source         = "./modules/route_table"
+  vpc_id         = module.vpc.vpc_id
+  subnet_ids     = module.private_subnets.subnet_ids
   gateway_id     = module.igw.igw_id
   nat_gateway_id = null
   name           = var.name
@@ -107,4 +125,45 @@ module "route53" {
   hosted_zone_id = var.hosted_zone_id
   subdomain      = each.value.subdomain
   public_ip      = local.infra_public_ip
+}
+
+
+module "db" {
+  source     = "terraform-aws-modules/rds/aws"
+  version    = "6.10.0"
+  identifier = "test-db"
+
+  engine            = "mysql"
+  engine_version    = "8.4.4"
+  instance_class    = "db.t3.micro"
+  allocated_storage = 20
+
+  db_name                     = "spotdb"
+  username                    = "user"
+  password                    = var.db_passwd
+  port                        = "3306"
+  publicly_accessible         = true
+  manage_master_user_password = false
+
+  multi_az                            = false
+  iam_database_authentication_enabled = true
+  vpc_security_group_ids              = local.sg_id_list
+
+  maintenance_window = "Mon:00:00-Mon:03:00"
+  backup_window      = "03:00-06:00"
+
+  tags = {
+    Owner       = "user"
+    Environment = "dev"
+  }
+
+  # DB subnet group
+  create_db_subnet_group = true
+  subnet_ids             = local.all_subnet_ids
+
+  # DB parameter group
+  family = "mysql8.4"
+
+  # DB option group
+  major_engine_version = "8.4"
 }

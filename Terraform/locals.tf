@@ -13,9 +13,15 @@ locals {
 }
 
 locals {
-  sg_ids = { for k, v in module.sg : k => v.sg_id }
+  infra_public_ip = lookup(module.ec2.ec2_mapped_by_name["testnet-Infra"], "public_ip", null)
+}
+
+
+locals {
+  sg_ids     = { for k, v in module.sg : k => v.sg_id }
+  sg_id_list = values(local.sg_ids) # 리스트로 변환
 }
 
 locals {
-  infra_public_ip = lookup(module.ec2.ec2_mapped_by_name["testnet-Infra"], "public_ip", null)
+  all_subnet_ids = concat(module.public_subnets.subnet_ids, module.private_subnets.subnet_ids)
 }

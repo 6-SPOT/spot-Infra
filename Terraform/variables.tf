@@ -23,7 +23,19 @@ variable "availability_zones" {
   default     = ["ap-northeast-2a", "ap-northeast-2c"]
 }
 
+variable "availability_zones_private" {
+  description = "List of availability zones"
+  type        = list(string)
+  default     = ["ap-northeast-2a", "ap-northeast-2c"]
+}
+
 variable "public_subnet_cidrs" {
+  description = "List of CIDR blocks for public subnets"
+  type        = list(string)
+  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+}
+
+variable "private_subnet_cidrs" {
   description = "List of CIDR blocks for public subnets"
   type        = list(string)
   default     = ["10.0.1.0/24", "10.0.2.0/24"]
@@ -34,6 +46,13 @@ variable "public_subnet_name" {
   type        = string
   default     = "my-public-subnet"
 }
+
+variable "private_subnet_name" {
+  description = "Name prefix for public subnets"
+  type        = string
+  default     = "my-public-subnet"
+}
+
 
 ### sg
 variable "sg_configs" {
@@ -221,4 +240,10 @@ variable "domain_mappings" {
   type = map(object({
     subdomain = string
   }))
+}
+
+### RDS
+variable "db_passwd" {
+  description = "db 패스워드입니다."
+  type = string
 }
